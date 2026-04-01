@@ -1,0 +1,19 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset=\"utf-8\">
+    <title>Blog List</title>
+  </head>
+  <body>
+    <h1>Blog List</h1>
+    <ul>
+      {% for blog in blogs %}
+        <li>
+          <strong>{{ blog.title }}</strong> by {{ blog.author }}
+        </li>
+      {% empty %}
+        <li>No blogs yet.</li>
+      {% endfor %}
+    </ul>
+  </body>
+</html>

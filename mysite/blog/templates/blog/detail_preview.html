@@ -1,0 +1,19 @@
+{% extends "blog/base.html" %}
+{% load blog_filters %}
+
+{% block title %}{{ block.super }} | Blog Detail{% endblock %}
+
+{% block content %}
+  <h1>Blog Detail Preview</h1>
+  {% if blog %}
+    <p><strong>ID:</strong> {{ blog.id }}</p>
+    <p><strong>Title:</strong> {{ blog.title }}</p>
+    <p><strong>Author:</strong> {{ blog.author|upper_surname }}</p>
+    <p><strong>Published:</strong> {{ blog.published_date|date:"Y-m-d" }}</p>
+    {% if page_title %}
+      <p><strong>Page Title:</strong> {{ page_title }}</p>
+    {% endif %}
+  {% else %}
+    <p>No blog found.</p>
+  {% endif %}
+{% endblock %}

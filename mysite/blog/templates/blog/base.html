@@ -1,0 +1,23 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>{% block title %}My Blog{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
+  </head>
+  <body>
+    <nav>
+      <a href="/blog/">All Blogs</a> |
+      <a href="/blog/search/">Search</a> |
+      <a href="/blog/preview/1/">Preview</a>
+    </nav>
+
+    <main>
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer>
+      <p>My Blog</p>
+    </footer>
+  </body>
+</html>
