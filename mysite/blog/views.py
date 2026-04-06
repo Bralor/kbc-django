@@ -20,12 +20,11 @@ class BlogDetailView(View):
     def get(self, request: HttpRequest, id: int) -> JsonResponse:
         blog = get_object_or_404(Blog, id=id)
 
-        return JsonResponse({
-            'id': blog.id,
-            'title': blog.title,
-            'author': blog.author,
-            'published_date': blog.published_date.isoformat(),
-        })
+        return render(
+            request,
+            'blog/detail_preview.html',
+            {'blog': blog},
+        )
 
 
 @csrf_exempt  # Only for demo/curl testing - in production use CSRF tokens
