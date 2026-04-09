@@ -1,0 +1,35 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog Search{% endblock %}
+
+{% block content %}
+<h1>Search Blogs</h1>
+
+<form method="get">
+    <label for="q">Title contains</label>
+    <input type="text" id="q" name="q" value="{{ form.q.value|default:'' }}">
+
+    <label for="sort">Sort</label>
+    <select id="sort" name="sort">
+        <option value="title" {% if form.sort.value == 'title' %}selected{% endif %}>Title</option>
+        <option value="author" {% if form.sort.value == 'author' %}selected{% endif %}>Author</option>
+        <option value="published_date" {% if form.sort.value == 'published_date' %}selected{% endif %}>Published date</option>
+    </select>
+
+    <button type="submit">Search</button>
+</form>
+
+<hr>
+<h2>Results ({{ blogs|length }})</h2>
+{% if blogs %}
+<ul>
+    {% for blog in blogs %}
+    <li>
+        <strong>{{ blog.title }}</strong> - {{ blog.author }} ({{ blog.published_date }})
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p>No blogs found for current query.</p>
+{% endif %}
+{% endblock %}

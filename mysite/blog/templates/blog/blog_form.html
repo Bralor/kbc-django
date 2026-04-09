@@ -1,0 +1,16 @@
+<!-- blog/templates/blog/blog_form.html -->
+{% extends "blog/base.html" %}
+
+{% block title %}
+  {% if blog %}Edit Blog{% else %}Create Blog{% endif %}
+{% endblock %}
+
+{% block content %}
+  <h1>{% if blog %}Edit blog{% else %}Create a new blog{% endif %}</h1>
+
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">{% if blog %}Update{% else %}Save{% endif %}</button>
+  </form>
+{% endblock %}
