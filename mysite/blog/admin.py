@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Blog, Comment, BlogReview, Author
+from blog.models import Blog, Comment, BlogReview
 
 
 class CommentInline(admin.TabularInline):
@@ -16,10 +16,10 @@ class BlogReviewInline(admin.TabularInline):
 
 @admin.register(Blog)
 class BlogAdmin(admin.ModelAdmin):
-    list_display = ('title', 'author', 'status', 'category_type', 'published_date', 'page_count')
-    list_filter = ('status', 'category_type', 'published_date')
+    list_display = ('title', 'author', 'category_type', 'published_date',)
+    list_filter = ('category_type', 'published_date')
     search_fields = ('title', 'content', 'author')
-    list_editable = ('status',)
+    # list_editable = ('status',)
     list_per_page = 25
     prepopulated_fields = {'slug': ('title',)}
     date_hierarchy = 'published_date'
@@ -40,7 +40,7 @@ class BlogReviewAdmin(admin.ModelAdmin):
     readonly_fields = ('created_at',)
 
 
-@admin.register(Author)
-class AuthorAdmin(admin.ModelAdmin):
-    list_display = ('name',)
-    search_fields = ('name',)
+# @admin.register(Author)
+# class AuthorAdmin(admin.ModelAdmin):
+#     list_display = ('name',)
+#     search_fields = ('name',)
