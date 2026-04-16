@@ -2,7 +2,6 @@ import json
 
 from django.db import DatabaseError, IntegrityError
 from django.views import View
-from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
 from django.http import JsonResponse, HttpRequest, HttpResponse
@@ -69,18 +68,15 @@ def comment_create(request: HttpRequest) -> HttpResponse:
     return render(request, 'blog/comment_form.html', {'form': form})
 
 
-@login_required
 @require_http_methods(["GET", "POST"])
-def review_create(request: HttpRequest) -> HttpResponse:  # TODO: Explain
-    form = BlogReviewForm(request.POST or None)  # TODO: Explain
+def review_create(request: HttpRequest) -> HttpResponse:
+    form = BlogReviewForm(request.POST or None)
     if form.is_valid():
-        BlogReview.objects.get_or_create(
+        BlogReview.objects.create(
             blog=form.cleaned_data['blog'],
-            user=request.user,
-            defaults={
-                'rating': form.cleaned_data['rating'],
-                'comment': form.cleaned_data['comment'],
-            },
+            user_id=1,  # default user for demo purposes
+            rating=form.cleaned_data['rating'],
+            comment=form.cleaned_data['comment'],
         )
         return redirect('blog:review_form_success')
 
