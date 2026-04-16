@@ -8,6 +8,8 @@
 {% block content %}
   <h1>{% if blog %}Edit blog{% else %}Create a new blog{% endif %}</h1>
 
+  {% if error %}<p class="error">{{ error }}</p>{% endif %}
+
   <form method="post">
     {% csrf_token %}
     {{ form.as_p }}

@@ -1,13 +1,14 @@
 {% extends 'blog/base.html' %}
 
-{% block title %}Add Comment{% endblock %}
+{% block title %}Submit Review{% endblock %}
 
 {% block content %}
-<h1>Add a Comment</h1>
+<h1>Submit a Blog Review</h1>
 
 <form method="post" novalidate>
     {% csrf_token %}
 
+    {# Non-field errors (e.g. "1-star review must include a comment") #}
     {% if form.non_field_errors %}
         <div class="alert alert-danger">
             <strong>Please correct the following:</strong>
@@ -19,6 +20,7 @@
         </div>
     {% endif %}
 
+    {# Render each field with its label, widget, help text, and errors #}
     {% for field in form %}
         <div class="form-group {% if field.errors %}has-error{% endif %}">
             <label for="{{ field.id_for_label }}">
@@ -42,6 +44,6 @@
         </div>
     {% endfor %}
 
-    <button type="submit">Submit Comment</button>
+    <button type="submit">Submit Review</button>
 </form>
 {% endblock %}

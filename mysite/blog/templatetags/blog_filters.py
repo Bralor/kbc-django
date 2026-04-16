@@ -11,5 +11,5 @@ def upper_surname(text: str):
         first_name, last_name = text.split(' ')
         return ' '.join([first_name, last_name.upper()])
     
-    except IndexError:
+    except ValueError:
         return text.upper()

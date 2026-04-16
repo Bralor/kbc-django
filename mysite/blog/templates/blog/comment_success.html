@@ -1,12 +1,10 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Comment Saved</title>
-</head>
-<body>
-    <h1>Comment saved</h1>
-    <p>Thank you, your review was submitted successfully.</p>
-    <p><a href="{% url 'blog:comment-form' %}">Add another comment</a></p>
-    <p><a href="{% url 'blog:blog_list' %}">Back to blog list</a></p>
-</body>
-</html>
+{% extends 'blog/base.html' %}
+
+{% block title %}Comment submitted{% endblock %}
+
+{% block content %}
+<h1>Comment submitted</h1>
+<p>Thank you, your comment was submitted successfully.</p>
+<p><a href="{% url 'blog:comment_create' %}">Add another comment</a></p>
+<p><a href="{% url 'blog:blog_list' %}">Back to blog list</a></p>
+{% endblock %}

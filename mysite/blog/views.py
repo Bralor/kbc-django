@@ -1,75 +1,120 @@
 import json
 
-from django.http import JsonResponse, HttpRequest, Http404, HttpResponse
-from django.shortcuts import render
-from http import HTTPStatus
+from django.db import DatabaseError, IntegrityError
+from django.views import View
+from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_http_methods
-from django.views import View
-from django.shortcuts import get_object_or_404
+from django.http import JsonResponse, HttpRequest, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Blog
+from blog.models import Blog, BlogReview
+from blog.forms import (CommentCreateForm,
+                        BlogReviewForm,
+                        BlogSearchForm,
+                        BlogModelForm)
 
 
-def blog_list(request: HttpRequest):
-    blogs = [blog for blog in Blog.objects.all()]
-    return render(request, 'blog/blog_list_static_example.html', {'blogs': blogs})
+# === HTML views (classic Django application) ===
+@require_http_methods(["GET"])
+def blog_list(request: HttpRequest) -> HttpResponse:
+    blogs = Blog.objects.all()
+    return render(request,
+                  'blog/blog_list_static_example.html',
+                  {'blogs': blogs})
 
 
 class BlogDetailView(View):
-    def get(self, request: HttpRequest, id: int) -> JsonResponse:
+    def get(self, request: HttpRequest, id: int) -> HttpResponse:
         blog = get_object_or_404(Blog, id=id)
+        return render(request, 'blog/detail_preview.html', {'blog': blog})
 
-        return render(
-            request,
-            'blog/detail_preview.html',
-            {'blog': blog},
+
+@require_http_methods(["GET", "POST"])
+def blog_create(request: HttpRequest) -> HttpResponse:
+    form = BlogModelForm(request.POST or None)  # TODO: Explain
+
+    if form.is_valid():
+        try:
+            blog = form.save()
+        except (DatabaseError, IntegrityError):
+            return render(request, 'blog/blog_form.html', {'form': form, 'error': 'Nepodařilo se uložit blog. Zkuste to znovu.'})
+        return redirect('blog:blog_detail', id=blog.id)
+    return render(request, 'blog/blog_form.html', {'form': form})
+
+
+@require_http_methods(["GET"])
+def blog_search(request: HttpRequest) -> HttpResponse:
+    form = BlogSearchForm(request.GET)
+    blogs = []
+
+    if form.is_valid():
+        query = form.cleaned_data['q']
+        sort = form.cleaned_data['sort']
+        blogs = Blog.objects.all()
+
+        if query:
+            blogs = blogs.filter(title__icontains=query)
+        blogs = blogs.order_by(sort)  # safe: sort je whitelisted přes ChoiceField
+    return render(request, 'blog/search.html', {'form': form, 'blogs': blogs})
+
+
+@require_http_methods(["GET", "POST"])
+def comment_create(request: HttpRequest) -> HttpResponse:
+    form = CommentCreateForm(request.POST or None)
+
+    if form.is_valid():
+        return render(request, 'blog/comment_success.html', {'data': form.cleaned_data})
+
+    return render(request, 'blog/comment_form.html', {'form': form})
+
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def review_create(request: HttpRequest) -> HttpResponse:  # TODO: Explain
+    form = BlogReviewForm(request.POST or None)  # TODO: Explain
+    if form.is_valid():
+        BlogReview.objects.get_or_create(
+            blog=form.cleaned_data['blog'],
+            user=request.user,
+            defaults={
+                'rating': form.cleaned_data['rating'],
+                'comment': form.cleaned_data['comment'],
+            },
         )
+        return redirect('blog:review_form_success')
+
+    return render(request, 'blog/review_form.html', {'form': form})
 
 
-@csrf_exempt  # Only for demo/curl testing - in production use CSRF tokens
-def blog_create(request):
-    # Demo-only example: keep it intentionally minimal.
-    if request.method != 'POST':
-        return JsonResponse({'tip': 'Send POST with title, author, published_date'})
-
-    data = json.loads(request.body)
-    blog = Blog.objects.create(
-        title=data['title'],
-        author=data['author'],
-        published_date=data['published_date'],
-    )
-    return JsonResponse({'id': blog.id, 'title': blog.title}, status=201)
+def review_success(request: HttpRequest) -> HttpResponse:   # TODO: Explain
+    return render(request, 'blog/review_success.html')
 
 
-def blog_search(request: HttpRequest) -> JsonResponse:    
-    query = request.GET.get('q', '')          # 'django' or empty string
-    sort = request.GET.get('sort', 'title')   # 'title' (default)
-    blogs = Blog.objects.all()
-    
-    if query:
-        blogs = blogs.filter(title__icontains=query)
-    
-    if sort in ('title', 'author', 'published_date'):
-        blogs = blogs.order_by(sort)
-    
-    return JsonResponse(list(blogs.values()), safe=False)
-
-
+# === JSON API views (REST-like přístup) ===
 @csrf_exempt
 @require_http_methods(["GET", "POST"])
-def blog_list_create(request: HttpRequest) -> JsonResponse:
+def api_blog_list_create(request: HttpRequest) -> JsonResponse:
     if request.method == 'GET':
         blogs = list(
             Blog.objects.order_by('-id').values('id', 'title', 'author', 'published_date')
         )
         return JsonResponse({'count': len(blogs), 'results': blogs})
 
-    if request.method == 'POST':
-        data = json.loads(request.body)
-        blog = Blog.objects.create(
-            title=data['title'],
-            author=data['author'],
-            published_date=data['published_date'],
-        )
-        return JsonResponse({'id': blog.id, 'title': blog.title}, status=201)
+    data = json.loads(request.body)
+    form = BlogModelForm(data)
+    if not form.is_valid():
+        return JsonResponse({'errors': form.errors}, status=400)
+
+    blog = form.save()
+    return JsonResponse({'id': blog.id, 'title': blog.title}, status=201)
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def api_comment_create(request: HttpRequest) -> JsonResponse:
+    data = json.loads(request.body)
+    form = CommentCreateForm(data)
+    if not form.is_valid():
+        return JsonResponse({'errors': form.errors}, status=400)
+    return JsonResponse({'status': 'ok', 'data': form.cleaned_data}, status=201)
