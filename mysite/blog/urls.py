@@ -8,6 +8,7 @@ urlpatterns = [
     path('', views.blog_list, name='blog_list'),
     path('<int:id>/', views.BlogDetailView.as_view(), name='blog_detail'),
     path('create/', views.blog_create, name='blog_create'),
+    path('<int:pk>/edit/', views.blog_update, name='blog_update'),
     path('search/', views.blog_search, name='blog_search'),
     path('comment/create/', views.comment_create, name='comment_create'),
     path('review-form/', views.review_create, name='review_form'),

@@ -29,17 +29,38 @@ class BlogDetailView(View):
         return render(request, 'blog/detail_preview.html', {'blog': blog})
 
 
+@csrf_exempt
 @require_http_methods(["GET", "POST"])
 def blog_create(request: HttpRequest) -> HttpResponse:
     form = BlogModelForm(request.POST or None)  # TODO: Explain
 
     if form.is_valid():
         try:
-            blog = form.save()
+            blog = form.save(commit=False)
+
+            if not blog.slug:
+                blog.slug = blog.title.lower().replace(' ', '-')
+            blog.save()
+
         except (DatabaseError, IntegrityError):
             return render(request, 'blog/blog_form.html', {'form': form, 'error': 'Nepodařilo se uložit blog. Zkuste to znovu.'})
         return redirect('blog:blog_detail', id=blog.id)
     return render(request, 'blog/blog_form.html', {'form': form})
+
+
+@csrf_exempt
+def blog_update(request: HttpRequest, pk: int):
+    blog = get_object_or_404(Blog, pk=pk)
+
+    if request.method == 'POST':
+        form = BlogModelForm(request.POST, instance=blog)
+        if form.is_valid():
+            form.save()
+            return render(request, 'blog/blog_update_success.html', {'form': form, 'blog': blog})
+    else:
+        form = BlogModelForm(instance=blog)  # pre-fill form with existing data
+
+    return render(request, 'blog/blog_form.html', {'form': form, 'blog': blog})
 
 
 @require_http_methods(["GET"])
