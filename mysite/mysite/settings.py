@@ -89,6 +89,20 @@ if os.environ.get('DB_DRIVER'):
         'extra_params': 'TrustServerCertificate=yes',
     }
 
+if os.environ.get('LEGACY_DB_NAME'):
+    DATABASES['legacy'] = {
+        'ENGINE': os.environ.get('DB_ENGINE', 'django.db.backends.sqlite3'),
+        'NAME': os.environ.get('LEGACY_DB_NAME'),
+        'USER': os.environ.get('DB_USER', ''),
+        'PASSWORD': os.environ.get('DB_PASSWORD', ''),
+        'HOST': os.environ.get('DB_HOST', ''),
+        'PORT': os.environ.get('DB_PORT', ''),
+        'OPTIONS': {
+            'driver': os.environ.get('DB_DRIVER'),
+            'extra_params': 'TrustServerCertificate=yes',
+        },
+    }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

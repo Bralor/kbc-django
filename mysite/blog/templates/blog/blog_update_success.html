@@ -1,0 +1,11 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Blog updated{% endblock %}
+
+{% block content %}
+<h1>Blog updated</h1>
+<p>The blog was saved successfully.</p>
+<p><a href="{% url 'blog:blog_update' pk=blog.pk %}">Edit again</a></p>
+<p><a href="{% url 'blog:blog_detail' id=blog.id %}">View blog</a></p>
+<p><a href="{% url 'blog:blog_list' %}">Back to blog list</a></p>
+{% endblock %}
