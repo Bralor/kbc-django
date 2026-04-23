@@ -15,5 +15,5 @@ dev = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
-pythonpath = ["src"]
+DJANGO_SETTINGS_MODULE = "mysite.settings"
+python_files = ["tests.py", "test_*.py"]
