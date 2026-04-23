@@ -26,8 +26,13 @@ class Blog(models.Model):
     class Meta:
         ordering = ['-published_date', 'title']
         indexes = [
-            models.Index(fields=['slug']),
-            models.Index(fields=['category_type', '-published_date']),
+            models.Index(fields=['slug'], name='blog_blog_slug_d925e3_idx'),
+            # Ascending only: mssql-django mishandles descending index columns
+            # ('-published_date') during AlterField. Default ordering stays DESC above.
+            models.Index(
+                fields=['category_type', 'published_date'],
+                name='blog_blog_categor_532e66_idx',
+            ),
         ]
 
     def __str__(self):
@@ -60,7 +65,10 @@ class BlogReview(models.Model):
             models.UniqueConstraint(fields=['blog', 'user'], name='unique_blog_review'),
         ]
         indexes = [
-            models.Index(fields=['blog', '-created_at']),
+            models.Index(
+                fields=['blog', 'created_at'],
+                name='blog_review_blog_id_98a2d8_idx',
+            ),
         ]
 
     def __str__(self):

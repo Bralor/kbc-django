@@ -12,8 +12,10 @@ dependencies = [
 [dependency-groups]
 dev = [
     "pytest>=9.0.3",
+    "pytest-django>=4.11",
 ]
 
 [tool.pytest.ini_options]
-DJANGO_SETTINGS_MODULE = "mysite.settings"
-python_files = ["tests.py", "test_*.py"]
+DJANGO_SETTINGS_MODULE = "mysite.settings_test"
+pythonpath = ["mysite"]
+python_files = ["test_*.py", "*_tests.py", "tests.py"]

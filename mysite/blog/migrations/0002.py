@@ -50,6 +50,6 @@ class Migration(migrations.Migration):
         ),
         migrations.AddIndex(
             model_name='blog',
-            index=models.Index(fields=['category_type', '-published_date'], name='blog_blog_categor_532e66_idx'),
+            index=models.Index(fields=['category_type', 'published_date'], name='blog_blog_categor_532e66_idx'),
         ),
     ]

@@ -28,7 +28,9 @@ def validate_blog_post(title: str, author: str, content: str) -> ValidationResul
         errors.append("Author must contain only letters and spaces")
 
     if not has_no_spam_words(content):
-    	return ValidationResult(is_valid=len(errors) == 0, errors=errors)
+        errors.append("Content looks like spam")
+
+    return ValidationResult(is_valid=len(errors) == 0, errors=errors)
 
 
 def validate_author_name(value: str) -> None:

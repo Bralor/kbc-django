@@ -38,7 +38,7 @@ class Migration(migrations.Migration):
             ],
             options={
                 'db_table': 'blog_reviews',
-                'indexes': [models.Index(fields=['blog', '-created_at'], name='blog_review_blog_id_98a2d8_idx')],
+                'indexes': [models.Index(fields=['blog', 'created_at'], name='blog_review_blog_id_98a2d8_idx')],
                 'constraints': [models.UniqueConstraint(fields=('blog', 'user'), name='unique_blog_review')],
             },
         ),

@@ -46,10 +46,6 @@ def test_multiple_errors():
     assert len(result.errors) == 3
 
 
-def test_simple_assert():
-    assert 1 == 2
-
-
 def test_author_with_numbers_raises():
     with pytest.raises(ValueError):
         validate_author_name("John123")
